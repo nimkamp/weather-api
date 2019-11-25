@@ -1,7 +1,6 @@
 from decimal import *
 import requests
 from urlparse import urlparse, parse_qs
-import json
 
 ACCUWEATHER_URL = "http://127.0.0.1:5000/accuweather?latitude=44&longitude=33"
 NOAA_URL = "http://127.0.0.1:5000/noaa?latlon=44,33"
@@ -68,10 +67,3 @@ def getTempByWeatherdotcomLocation(latitude, longitude):
         response = requests.post(url = WEATHERDOTCOM_URL, json={"lat": latitude, "lon": longitude})
         data = response.json()
         return float(data["query"]["results"]["channel"]["condition"]["temp"])
-
-    
-
-# getTempByNOAALocation(44,33)
-# getTempByAcccuweatherLocation(44,33)
-# getTempByWeatherdotcomLocation(33.3, 44.4)
-print(getCurrentAverageTemperature(44, 33, ["noaa", "accuweather", "weatherdotcom"]))

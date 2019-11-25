@@ -1,0 +1,22 @@
+func getCurrentAverageTemperature(lat, long, filters)
+sum = 0
+for each filter in filters
+    if filter is accuweather
+        sum += getAccuweathercurrenttemperature(lat, long)
+    elseif filter is NOAA
+        sum+=getNOAACurrentTemperature(lat, long)
+    else
+        sum += getWeatherdotcomCurrentTemperature(lat, long)
+return sum/len(filters)
+
+func getNOAACurrentTemperature(lat, long)
+res = GET /noaa?latlon=lat,long
+return parseCurrentTemperature from res
+
+func getWeatherdotcom(lat, long)
+res = POST /weatherdotcom {"lat":lat,"lon":long}
+return parseCurrentTemperat ure from res
+
+func getAccuweather(lat, long)
+res = GET /accuweather?latitude=lat&longitude=long
+return parseCurrentTemperature from res

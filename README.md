@@ -18,10 +18,8 @@ python test_getcurrentaveragetemperature.py -v
 
 ```
 
-## Running Project 
-You need to pass in two paramters when executing the binary for pass-as-a-service. The first parameter is the passwords file and the second parameter is the groups file.
+## Running Project
 ```
 cd weather-api/api/
 python manage.py runserver
 ```
-

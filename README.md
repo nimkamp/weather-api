@@ -7,8 +7,11 @@ This project contains several api endpoints displaying current average temperatu
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
-Python 2.7+
-Django
+python27 or python34
+python-django
+pip
+virtualenv (For flask application)
+
 
 
 ### Run Unit tests

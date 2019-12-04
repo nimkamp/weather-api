@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from decimal import *
 from urlparse import urlparse, parse_qs
 import json
-
+from django.http import HttpResponse, HttpResponseNotFound
 # Create your views here.
 
 ACCUWEATHER_URL = "http://127.0.0.1:5000/accuweather"
@@ -35,35 +35,32 @@ def getTempByNOAALocation(latitude, longitude):
     o = urlparse(NOAA_URL)
     query = parse_qs(o.query)
 
-    if (latitude >= -90 and latitude <= 90 and longitude >= -180 and longitude <= 180):
-        if 'latlon' in query:
-            query['latlon'] = str(latitude) + ',' + str(longitude)
+    if (latitude >= -90 and latitude <= 90 and longitude >= -180 and longitude <= 180):        
+        response = requests.get(NOAA_URL, params={'latlon': str(latitude) + ',' + str(latitude)})
+        if response.status_code == 200:
+            temperature = response.json()
+            return float(temperature["today"]["current"]["fahrenheit"])
         else:
-            print("Nothing")
-    else:
-        print("Invalid latitude or longitude!")
+            return HttpResponse(status=500)
+    else: 
+        return HttpResponse(status=404)
 
-    response = requests.get(NOAA_URL, params={'latlon': str(latitude) + ',' + str(latitude)})
-    temperature = response.json()
-    return float(temperature["today"]["current"]["fahrenheit"])
+            
 
 def getTempByAcccuweatherLocation(latitude, longitude):
     o = urlparse(ACCUWEATHER_URL)
     query = parse_qs(o.query)
+    settings.configure()
 
     if (latitude >= -90 and latitude <= 90 and longitude >= -180 and longitude <= 180):
-        if 'latitude' in query:
-            query['latitude'] = str(latitude)
-        elif 'longitude' in query:  
-            query['longitude'] = str(longitude)
+        response = requests.get(ACCUWEATHER_URL, params={'latitude': latitude, 'longitude': longitude})
+        if response.status_code == 200:
+            temperature = response.json()
+            return float(temperature["simpleforecast"]["forecastday"][0]["current"]["fahrenheit"])
         else:
-            print("Nothing")
-    else:
-        print("Invalid latitude or longitude!")
-
-    response = requests.get(ACCUWEATHER_URL, params={'latitude': latitude, 'longitude': longitude})
-    data = response.json()
-    return float(data["simpleforecast"]["forecastday"][0]["current"]["fahrenheit"])
+            return HttpResponse(status=500)
+    else: 
+        return HttpResponse(status=404)
 
 def getTempByWeatherdotcomLocation(latitude, longitude):
     if (latitude >= -90 and latitude <= 90 and longitude >= -180 and longitude <= 180):
@@ -73,8 +70,13 @@ def getTempByWeatherdotcomLocation(latitude, longitude):
         }
 
         response = requests.post(url = WEATHERDOTCOM_URL, json={"lat": latitude, "lon": longitude})
-        data = response.json()
-        return float(data["query"]["results"]["channel"]["condition"]["temp"])
+        if response.status_code == 200:
+            temperature = response.json()
+            return float(temperature["query"]["results"]["channel"]["condition"]["temp"])
+        else:
+            return HttpResponse(status=500)
+    else:
+        return HttpResponse(status=404)
 
 def weather(request):
     result = json.loads(request.body)
